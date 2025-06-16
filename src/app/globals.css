@@ -1,26 +1,82 @@
-@import "tailwindcss";
+/* /easytrade-ui/src/app/globals.css */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
-
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+@layer base {
+  html {
+    @apply h-full; /* Ensure html takes full height */
+  }
+  body {
+    @apply bg-easytrade-lightgray text-easytrade-black antialiased font-sans flex flex-col h-full;
+    /* font-sans will use --font-inter from tailwind.config.ts if defined in theme.fontFamily */
   }
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+/* --- Floating Cubes Background --- */
+.cubes-container {
+  position: fixed; /* Fixed position to cover viewport */
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  overflow: hidden; /* Prevent scrollbars if cubes go out of bounds during animation */
+  z-index: -1;     /* Place it behind the main content wrapper */
+  pointer-events: none; /* Allow clicks to pass through */
+}
+
+.cubes-container .cube {
+  position: absolute;
+  list-style: none;
+  display: block;
+  /* Size and initial opacity are controlled by JS via inline style and CSS variables */
+  width: var(--cube-actual-size, 20px);
+  height: var(--cube-actual-size, 20px);
+  background-color: rgba(200, 200, 255, 0.03); /* A very subtle default fallback */
+  
+  /* Start position: JS sets left/top randomly, CSS sets bottom to start them off-screen rising up */
+  bottom: -200px; /* Ensure they start well below the viewport */
+  
+  /* Animation properties are set by JS inline style */
+  /* e.g., animation: animateCubes 25s linear infinite; */
+  /* animation-timing-function: linear; */
+  /* animation-iteration-count: infinite; */
+  opacity: 0; /* Animation will fade them in */
+  border-radius: 0%; /* Animation can change this to 50% */
+}
+
+/* Specific cube colors - applied by JS className */
+.cubes-container .cube.cube-color-1 { background-color: rgba(59, 130, 246, 0.06); }   /* easytrade-blue @ 6% opacity */
+.cubes-container .cube.cube-color-2 { background-color: rgba(17, 24, 39, 0.06); }    /* easytrade-black @ 6% opacity */
+.cubes-container .cube.cube-color-3 { background-color: rgba(107, 114, 128, 0.06); } /* easytrade-gray @ 6% opacity */
+.cubes-container .cube.cube-color-4 { background-color: rgba(229, 231, 235, 0.08); } /* Tailwind gray-200 @ 8% */
+
+/* Keyframes for the rising, rotating, and fading animation */
+@keyframes animateCubes {
+  0% {
+    transform: translateY(0) rotate(0deg);
+    opacity: 0;
+    border-radius: 0%;
+  }
+  10% { /* Start becoming visible */
+    opacity: var(--cube-max-opacity, 0.08); /* Use JS-set variable or default */
+  }
+  20% { /* Fully visible */
+     opacity: var(--cube-max-opacity, 0.08);
+  }
+  90% { /* Start fading out */
+    opacity: calc(var(--cube-max-opacity, 0.08) * 0.3);
+  }
+  100% {
+    transform: translateY(-120vh) rotate(720deg); /* Move well off the top of the screen */
+    opacity: 0;
+    border-radius: 50%; /* Change shape as it fades */
+  }
+}
+
+/* Other global styles */
+input[type="number"]::-webkit-inner-spin-button,
+input[type="number"]::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
 }

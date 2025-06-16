@@ -1,103 +1,84 @@
-import Image from "next/image";
+// /easytrade-ui/src/app/page.tsx
+import Link from 'next/link';
+import Image from 'next/image';
+import { montserrat } from '@/app/ui/fonts';
+import EasyTradeLogo from '@/app/ui/easytrade-logo';
 
-export default function Home() {
+export default function HomePage() {
   return (
-    <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]">
-      <main className="flex flex-col gap-[32px] row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="list-inside list-decimal text-sm/6 text-center sm:text-left font-[family-name:var(--font-geist-mono)]">
-          <li className="mb-2 tracking-[-.01em]">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] px-1 py-0.5 rounded font-[family-name:var(--font-geist-mono)] font-semibold">
-              src/app/page.tsx
-            </code>
-            .
-          </li>
-          <li className="tracking-[-.01em]">
-            Save and see your changes instantly.
-          </li>
-        </ol>
-
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:w-auto"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
+    <div>
+      {/* Hero Section ... (as before) ... */}
+      <section className="bg-gray-50 dark:bg-gray-800 rounded-lg shadow-lg p-8 md:p-12 mb-12 flex flex-col md:flex-row items-center">
+        <div className="md:w-1/2 mb-8 md:mb-0 md:pr-8 text-center md:text-left">
+          <h1 className={`${montserrat.className} text-4xl md:text-5xl font-extrabold text-easytrade-black dark:text-white mb-4`}>
+            Welcome to <EasyTradeLogo size="text-4xl md:text-5xl inline-block" />!
+          </h1>
+          <p className="text-lg text-gray-600 dark:text-gray-300 mb-6">
+            Your one-stop marketplace to buy and sell amazing products within your community.
+          </p>
+          <Link
+            href="/products" // Main browse products page
+            className="inline-block bg-easytrade-blue text-white font-bold py-3 px-8 rounded-lg hover:bg-blue-700 transition duration-300 text-base md:text-lg shadow hover:shadow-md"
           >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 w-full sm:w-auto md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read our docs
-          </a>
+            Browse All Products
+          </Link>
         </div>
-      </main>
-      <footer className="row-start-3 flex gap-[24px] flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
+        <div className="md:w-1/2">
           <Image
-            aria-hidden
-            src="/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
+            src="/ecommerce-hero-desktop.jpg"
+            width={1000} height={600}
+            className="rounded-lg shadow-xl object-cover"
+            alt="Featured products for EasyTrade"
+            priority
           />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
+        </div>
+      </section>
+
+      {/* Featured Products (Placeholder) ... (as before) ... */}
+      <section className="mb-12">
+        <h2 className={`${montserrat.className} text-3xl font-bold text-easytrade-black dark:text-white mb-8 text-center`}>
+          Featured Products
+        </h2>
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 md:gap-8">
+          {[1, 2, 3, 4].map((item) => (
+            <div key={item} className="bg-white dark:bg-gray-700 rounded-lg shadow-md p-4 md:p-6 hover:shadow-xl transition-shadow flex flex-col">
+              <div className="bg-gray-200 dark:bg-gray-600 h-48 w-full rounded-md mb-4 flex items-center justify-center overflow-hidden">
+                <span className="text-gray-400 dark:text-gray-500">Product Image {item}</span>
+              </div>
+              <h3 className={`${montserrat.className} text-lg md:text-xl font-semibold mb-2 text-easytrade-black dark:text-white truncate`}>Product Name {item}</h3>
+              <p className="text-sm text-gray-500 dark:text-gray-400 mb-1">Seller: SellerName</p>
+              <p className={`${montserrat.className} text-xl md:text-2xl font-bold text-easytrade-black dark:text-white mb-4`}>$XX.XX</p>
+              <Link href={`/products/placeholder-${item}`} className="block w-full text-center bg-easytrade-black text-white dark:bg-easytrade-blue dark:text-white py-2.5 px-4 rounded-lg hover:bg-gray-700 dark:hover:bg-blue-700 transition mt-auto text-sm font-medium">
+                View Details
+              </Link>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      {/* Call to Action Section */}
+      <section className="bg-easytrade-blue text-white rounded-lg shadow-lg p-8 md:p-12 text-center">
+        <h2 className={`${montserrat.className} text-3xl font-bold mb-4`}>
+            Ready to Start Trading?
+        </h2>
+        <p className="text-lg text-blue-100 mb-6 max-w-2xl mx-auto">
+            Join our community of buyers and sellers today. It's easy, fast, and secure.
+        </p>
+        <div className="space-y-4 sm:space-y-0 sm:space-x-4">
+            <Link
+                href="/register" // This is the generic registration, can be used by sellers
+                className="inline-block bg-white text-easytrade-blue font-bold py-3 px-8 rounded-lg hover:bg-gray-100 transition duration-300 text-base md:text-lg shadow hover:shadow-md"
+            >
+                Sign Up to Sell
+            </Link>
+            <Link
+                href="/products" // <<< "START SHOPPING" NOW GOES TO /products
+                className="inline-block bg-transparent border-2 border-white text-white font-bold py-3 px-8 rounded-lg hover:bg-white hover:text-easytrade-blue transition duration-300 text-base md:text-lg"
+            >
+                Start Shopping
+            </Link>
+        </div>
+      </section>
     </div>
   );
 }

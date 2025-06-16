@@ -1,0 +1,95 @@
+/* /easytrade-ui/src/app/ui/floating-cubes.css */
+
+/* This container is positioned fixed to fill the viewport and sit behind content */
+.cubes-container {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  overflow: hidden; /* Important to prevent scrollbars from cubes moving off-screen */
+  z-index: -1;     /* Places it behind other content (ensure other content has z-index or is positioned) */
+  pointer-events: none; /* Allows clicks to pass through to elements behind it */
+  /* background-color: transparent; /* Or your desired page background if not set on body */
+}
+
+/* Base style for each individual cube */
+.cubes-container .cube {
+  position: absolute; /* Positioned within the .cubes-container */
+  width: 40px;  /* Cube size - can be a CSS variable from :root in globals.css if preferred */
+  height: 40px; /* Cube size */
+  opacity: 0.08; /* Make them very subtle so they don't distract */
+  border-radius: 4px; /* Optional: slightly rounded cubes */
+  /*
+    The 'transform' for initial rotation/position is set by JS inline style.
+    The 'animation' property will apply the keyframe animations.
+    Using two animations: one for rotation, one for drifting.
+  */
+  animation-name: rotateCube, driftCubeSoft; /* Apply both animations (driftCubeSoft defined in globals.css or here) */
+  animation-timing-function: linear, ease-in-out; /* Timing for each animation */
+  animation-iteration-count: infinite, infinite; /* Both loop infinitely */
+  animation-direction: normal, alternate; /* driftCubeSoft alternates direction */
+  /* animation-duration and animation-delay are set by inline styles from the JS component */
+}
+
+/* Define colors for different types of cubes, referenced by JS: className={`cube cube${(i % 4) + 1}`} */
+/* Using CSS variables defined in :root of globals.css or directly hex values */
+.cubes-container .cube.cube1 {
+  background-color: var(--easytrade-blue, #3B82F6); /* Fallback to hex if CSS var not found */
+}
+.cubes-container .cube.cube2 {
+  background-color: var(--easytrade-black, #111827);
+}
+.cubes-container .cube.cube3 {
+  background-color: #9CA3AF; /* Tailwind's gray-400 */
+}
+.cubes-container .cube.cube4 {
+  background-color: #E5E7EB; /* Tailwind's gray-200 (for lighter cubes) */
+  border: 1px solid #D1D5DB; /* Add a border for light cubes on light background */
+}
+
+
+/* If you are NOT doing 3D faces, the .cube-face related CSS below is not needed */
+/* If you ARE doing 3D faces (meaning each .cube div has 6 child divs for faces): */
+.cubes-container .cube .cube-face {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  border: 1px solid rgba(150, 150, 150, 0.1); /* Very subtle border for faces */
+  /* The background-color for faces will be inherited from the parent .cube.cubeN if not set individually */
+}
+
+.cubes-container .cube .cube-face-front  { transform: rotateY(  0deg) translateZ(20px); } /* Half of 40px cube size */
+.cubes-container .cube .cube-face-back   { transform: rotateY(180deg) translateZ(20px); }
+.cubes-container .cube .cube-face-right  { transform: rotateY( 90deg) translateZ(20px); }
+.cubes-container .cube .cube-face-left   { transform: rotateY(-90deg) translateZ(20px); }
+.cubes-container .cube .cube-face-top    { transform: rotateX( 90deg) translateZ(20px); }
+.cubes-container .cube .cube-face-bottom { transform: rotateX(-90deg) translateZ(20px); }
+
+
+/* Keyframes for the rotation animation */
+/* Ensure these @keyframes are defined either here or in globals.css, but not both places */
+/* If they are in globals.css, you don't need them here. */
+@keyframes rotateCube {
+  from {
+    /* Initial rotation can be set by JS inline style if you want variety */
+    /* transform: rotateX(0deg) rotateY(0deg); */
+  }
+  to {
+    transform: rotateX(360deg) rotateY(360deg); /* Full spin */
+  }
+}
+
+/* Keyframes for the drifting animation */
+/* This version uses CSS variables for target offsets, which are set by JS */
+@keyframes driftCubeSoft {
+  0% {
+    /* Initial transform (including rotation from JS) is the base */
+    /* The drift is added to the existing transform or starts from the JS set position */
+    transform: translate(0vw, 0vh) rotateX(var(--initial-rx, 0deg)) rotateY(var(--initial-ry, 0deg));
+  }
+  100% {
+    /* Drifts to a random target based on --tx and --ty, while maintaining its ongoing rotation */
+    transform: translate(calc(var(--tx, 0) * 1vw), calc(var(--ty, 0) * 1vh)) rotateX(calc(var(--initial-rx, 0deg) + 360deg)) rotateY(calc(var(--initial-ry, 0deg) + 360deg));
+  }
+}
