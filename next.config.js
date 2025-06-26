@@ -7,7 +7,7 @@ const nextConfig = {
     remotePatterns: [
       {
         protocol: 'http',        // Or 'https' if the images from example.com are HTTPS
-        hostname: 'example.com', // Whitelisting example.com as per your previous config
+        hostname: 'easytrade.com', // Whitelisting example.com as per your previous config
       },
       // If you have other external image domains, add them here as new objects:
       // {
