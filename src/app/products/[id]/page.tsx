@@ -5,17 +5,16 @@ import type { Product } from '@/app/lib/definitions';
 import { notFound } from 'next/navigation';
 import Image from 'next/image';
 import { montserrat, lusitana } from '@/app/ui/fonts';
-import AddToCartButton from '@/app/ui/products/add-to-cart-button'; // Import the button component
+import AddToCartButton from '@/app/ui/products/add-to-cart-button';
 import { Metadata, ResolvingMetadata } from 'next';
+import Link from 'next/link'; // <--- THIS IS THE FIX
 
-// This is a Page Component. It receives `params` as a prop.
 interface ProductDetailsPageProps {
   params: {
-    id: string; // The 'id' from the folder name [id] will be a string
+    id: string;
   };
 }
 
-// Optional but recommended: Generate dynamic metadata for the page title and description
 export async function generateMetadata(
   { params }: ProductDetailsPageProps,
   parent: ResolvingMetadata
@@ -34,42 +33,35 @@ export async function generateMetadata(
     title: `${product.name} | EasyTrade`,
     description: product.description || `Buy ${product.name} on EasyTrade.`,
     openGraph: {
-      images: [product.imageUrl || '/default-og-image.png'], // Add a default OG image to your /public folder
+      images: [product.imageUrl || '/default-og-image.png'],
     },
   };
 }
 
-
-// This is the main Page component. It's a Server Component by default.
 export default async function ProductDetailsPage({ params }: ProductDetailsPageProps) {
   const id = parseInt(params.id, 10);
 
-  // Validate that the ID from the URL is a valid number
   if (isNaN(id)) {
-    notFound(); // Triggers the not-found.tsx page
+    notFound();
   }
 
-  // Fetch the product data on the server using the ID
   const product = await fetchProductById(id);
 
-  // If the API returns null (e.g., for a 404), show the not-found page
   if (!product) {
     notFound();
   }
 
-  // If we reach here, the product was found. Render the page UI.
   return (
     <div className="container mx-auto px-4 py-8">
       <div className="grid grid-cols-1 md:grid-cols-2 gap-8 lg:gap-12">
         
-        {/* Image Column */}
         <div className="bg-white p-4 rounded-lg shadow-lg">
           <div className="relative aspect-square w-full">
             {product.imageUrl ? (
               <Image
                 src={product.imageUrl.startsWith('http') ? product.imageUrl : '/placeholder-product.svg'}
                 alt={product.name}
-                fill // Use fill to cover the parent container
+                fill
                 className="rounded-md object-cover"
               />
             ) : (
@@ -80,7 +72,6 @@ export default async function ProductDetailsPage({ params }: ProductDetailsPageP
           </div>
         </div>
 
-        {/* Details Column */}
         <div className="flex flex-col">
           <h1 className={`${montserrat.className} text-3xl md:text-4xl font-extrabold text-easytrade-black mb-2`}>
             {product.name}
@@ -96,8 +87,6 @@ export default async function ProductDetailsPage({ params }: ProductDetailsPageP
             <p>{product.description || 'No description provided for this item.'}</p>
           </div>
           
-          {/* RENDER THE BUTTON COMPONENT HERE */}
-          {/* We pass the fetched 'product' object as a prop to our client component */}
           <div className="mt-auto pt-6 border-t border-gray-200">
             <AddToCartButton product={product} />
           </div>
