@@ -13,6 +13,7 @@ import {
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:8080';
 
+// This is a helper function, not exported, to keep API calls consistent.
 async function callProductApi(endpoint: string, method: 'POST' | 'PUT' | 'DELETE', body?: any) {
   const url = `${API_BASE_URL}${endpoint}`;
   const options: RequestInit = { method, headers: { 'Content-Type': 'application/json' } };
@@ -33,6 +34,7 @@ export async function createListingAction(
   prevState: CreateListingActionState,
   formData: FormData
 ): Promise<CreateListingActionState> {
+  // ... (This function's code remains the same as it's used with useFormState)
   console.log('Server Action: createListingAction invoked.');
   const rawFormData = {
     name: formData.get('name'),
@@ -49,54 +51,39 @@ export async function createListingAction(
      return { errors: { price: ['Price is required.'] }, message: 'Validation Error: Price is missing.', success: false };
   }
 
-  // --- TEMPORARY SELLER USERNAME ---
-  let sellerUsername: string | undefined = "DefaultSeller"; // Assign a default for now
-
-  // Placeholder for future NextAuth.js integration:
+  let sellerUsername: string = "DefaultSeller"; // Fallback
+  // TODO: Replace with actual session logic
   // const session = await auth();
-  // if (session?.user?.username) {
-  //   sellerUsername = session.user.username;
-  // }
-
-  // If, even after trying to get from auth, it's still undefined, use the default
-  if (!sellerUsername) {
-    console.warn("createListingAction: sellerUsername could not be determined from auth, using default.");
-    sellerUsername = "DefaultSeller_Fallback"; // Should ideally not be reached if above default is set
-  }
-  // --- END TEMPORARY SELLER USERNAME ---
+  // if (session?.user?.username) { sellerUsername = session.user.username; }
 
   const payload: ProductApiPayload = {
     name: validationResult.data.name,
     description: validationResult.data.description,
     price: validationResult.data.price!,
-    sellerUsername: sellerUsername, // Now uses the default or auth-derived username
+    sellerUsername: sellerUsername,
   };
 
   try {
     const createdProduct: Product = await callProductApi('/api/products', 'POST', payload);
-    console.log('Product created via API:', createdProduct);
     revalidatePath('/dashboard/listings');
     revalidatePath('/products');
-    revalidatePath('/dashboard'); // Revalidate dashboard to update latest listings
+    revalidatePath('/dashboard');
     return { message: `Product "${createdProduct.name}" added successfully!`, success: true };
   } catch (e:any) {
-    console.error('createListingAction API catch:', e.message);
     return { success: false, message: `API Error: ${e.message}`, errors: { api: [e.message] } };
   }
 }
 
-// updateListingAction (ensure sellerUsername is not overwritten if not intended)
 export async function updateListingAction(
   productId: string | number,
   prevState: UpdateListingActionState,
   formData: FormData
 ): Promise<UpdateListingActionState> {
+  // ... (This function's code remains the same as it's used with useFormState)
   const rawFormData = { name: formData.get('name'), description: formData.get('description'), price: formData.get('price'), };
   const validationResult = ListingFormSchema.safeParse(rawFormData);
   if (!validationResult.success) { return { errors: validationResult.error.flatten().fieldErrors, message: 'Validation Error.', success: false };}
   
-  // For PUT, usually you only send fields that are allowed to be changed.
-  // sellerUsername is typically NOT changed during a product update by a user.
   const payload: Partial<ProductApiPayload> = {
     name: validationResult.data.name,
     description: validationResult.data.description,
@@ -106,25 +93,51 @@ export async function updateListingAction(
   if (Object.values(payload).every(value => value === undefined || value === null || value === '')) {
     return { message: "No changes detected to update.", success: true };
   }
-  // TODO: Add ownership check here using authenticated user session
+  
   try {
     const updatedProduct: Product = await callProductApi(`/api/products/${productId}`, 'PUT', payload);
     revalidatePath('/dashboard/listings');
     revalidatePath(`/dashboard/listings/${productId}/edit`);
     revalidatePath(`/products/${productId}`);
-    revalidatePath('/dashboard'); // Revalidate dashboard
+    revalidatePath('/dashboard');
     return { message: `Product "${updatedProduct.name}" updated successfully!`, success: true };
   } catch (e:any) { return { success: false, message: `API Error: ${e.message}`, errors: { api: [e.message] } }; }
 }
 
-// deleteListingAction
-export async function deleteListingAction(id: string | number, prevState?: DeleteListingActionState): Promise<DeleteListingActionState> {
-  // TODO: Add ownership check here
+
+// --- THIS IS THE CORRECTED FUNCTION ---
+// The signature is changed to be compatible with a standard form action when using .bind().
+// The `formData` parameter comes after any bound arguments.
+export async function deleteListingAction(
+  id: string | number,
+  formData: FormData // This parameter makes the signature compatible with the <form> action prop.
+): Promise<DeleteListingActionState> { // We can still return a state object, though we aren't using useFormState here.
+  
+  // TODO: Add authentication/authorization checks here.
+  // For example: get user session, check if user owns product with this 'id'.
+  
+  console.log(`Server Action: Attempting to delete listing with id: ${id}`);
+  // The formData parameter is present to match the expected signature, but we don't need to use its contents.
+  console.log('Received form data (unused for delete action):', formData);
+
   try {
-    await callProductApi(`/api/products/${id}`, 'DELETE');
+    // The callProductApi helper already handles the fetch logic.
+    // The response might be null for a 204 No Content, or a JSON object for other success statuses.
+    const result = await callProductApi(`/api/products/${id}`, 'DELETE');
+    
+    // Revalidate paths to ensure the UI updates and removes the deleted item.
     revalidatePath('/dashboard/listings');
     revalidatePath('/products');
-    revalidatePath('/dashboard'); // Revalidate dashboard
-    return { success: true, message: `Product ${id} deleted successfully.` };
-  } catch (e:any) { return { success: false, message: `API Error: ${e.message}`, errors: { api: [e.message] } }; }
+    revalidatePath('/dashboard'); // Revalidate dashboard if it shows latest listings.
+    
+    console.log(`Server Action: Successfully initiated delete for listing ${id}. Paths revalidated.`);
+    // Returning a success state. A client component could potentially handle this, but for now, revalidatePath is key.
+    return { success: true, message: (result as any)?.message || `Product ${id} deleted successfully.` };
+
+  } catch (error: unknown) {
+    const errorMessage = error instanceof Error ? error.message : 'An unexpected error occurred.';
+    console.error('Server Action Error - deleteListingAction:', errorMessage);
+    // Return a state object with the error message.
+    return { success: false, message: `API Error: ${errorMessage}`, errors: { api: [errorMessage] } };
+  }
 }
