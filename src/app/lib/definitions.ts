@@ -23,6 +23,15 @@ export type Product = {
   updatedAt?: string;
 };
 
+// --- ADD THIS TYPE DEFINITION ---
+export type UserDashboardSummary = {
+  username: string;
+  activeListingsCount: number;
+  // Add other summary fields here if you plan to have them, e.g., totalSales, etc.
+};
+// --- END OF ADDED TYPE DEFINITION ---
+
+
 // --- Zod Schemas for Validation ---
 export const ListingFormSchema = z.object({
   name: z.string().min(1, { message: 'Product name is required.' }),
@@ -58,5 +67,3 @@ export type FormState = {
 export type CreateListingActionState = FormState;
 export type UpdateListingActionState = FormState;
 export type DeleteListingActionState = FormState;
-
-// REMOVED DashboardStats and ActivityDataPoint as they are not used in the simplified dashboard
